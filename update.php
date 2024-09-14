@@ -18,7 +18,7 @@ if (!file_exists('.env')) {
 $config = parse_ini_file('.env', false, INI_SCANNER_TYPED);
 
 // Get the domains from the URL parameter and split them from the comma separated string
-$domains = explode(',', $_REQUEST['domain']);
+$domains = explode(',', $_REQUEST['hostname']);
 
 // Loop through each domain and call the Handler
 foreach ($domains as $domain) {
