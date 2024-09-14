@@ -17,12 +17,17 @@ final class Payload
     /**
      * @var string
      */
-    private $domain;
+    private $hostname;
 
     /**
      * @var string
      */
-    private $mode;
+    private $mode = "both";
+
+    /**
+     * @var string
+     */
+    private $myip;
 
     /**
      * @var string
@@ -45,7 +50,13 @@ final class Payload
             if (isset($payload[$key])) {
                 $this->$key = $payload[$key];
             }
-        }
+	}
+	if (!empty($this->myip)) {
+	    $ips = explode(',', $this->myip);
+	    $this->ipv6 = $ips[0];
+	    $this->ipv4 = $ips[1];
+	    $this->ipv4 = str_replace($this->hostname, "", $this->ipv4); // Yeah, speedport
+	}
     }
 
     /**
@@ -54,9 +65,9 @@ final class Payload
     public function isValid()
     {
         return
-            !empty($this->user) &&
-            !empty($this->password) &&
-            !empty($this->domain) &&
+            # !empty($this->user) &&
+            # !empty($this->password) &&
+            !empty($this->hostname) &&
             (
                 (
                     !empty($this->ipv4) && $this->isValidIpv4()
@@ -89,7 +100,7 @@ final class Payload
      */
     public function getDomain()
     {
-        return $this->domain;
+        return $this->hostname;
     }
 
     /**
@@ -127,11 +138,11 @@ final class Payload
     public function getHostname()
     {
         // hack if top level domain are used for dynDNS
-        if (1 === substr_count($this->domain, '.')) {
+        if (1 === substr_count($this->hostname, '.')) {
             return $this->domain;
         }
 
-        $domainParts = explode('.', $this->domain);
+        $domainParts = explode('.', $this->hostname);
         array_shift($domainParts); // remove sub domain
         return implode('.', $domainParts);
     }
